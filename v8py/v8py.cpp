@@ -3,7 +3,6 @@
 #include <v8.h>
 #include <libplatform/libplatform.h>
 
-#include "greenstack.h"
 #include "context.h"
 #include "convert.h"
 #include "script.h"
@@ -168,8 +167,6 @@ PyMODINIT_FUNC PyInit__v8py() {
     PyObject *module = PyModule_Create(&v8_module_def);
 #endif
     if (module == NULL) return FAIL;
-
-    if (greenstack_init() < 0) return FAIL;
 
     if (context_type_init() < 0) return FAIL;
     Py_INCREF(&context_type);

@@ -194,7 +194,7 @@ setup(
     ext_modules=[extension],
 
     extras_require={
-        'devtools': ['gevent', 'greenstack-greenlet', 'karellen-geventws'],
+        'devtools': ['gevent', 'karellen-geventws'],
     },
     setup_requires=['pytest-runner'],
     tests_require=['pytest'],

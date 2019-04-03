@@ -4,14 +4,14 @@ python:
     - 3.5
 script:
     - ./setup.py test
-    - pip uninstall -y greenstack && ./setup.py develop && python -c "import v8py"
+    - ./setup.py develop && python -c "import v8py"
 
 dist: trusty
 sudo: false
 group: beta
 
 install:
-    - pip install twine pytest greenstack
+    - pip install twine pytest
     - export CFLAGS='-g -O0 --coverage'
 
 # it takes ages to compile v8 so don't do it too often

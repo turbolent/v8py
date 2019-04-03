@@ -4,7 +4,6 @@ from .debug import Debugger, DebuggerError
 try:
     from gevent import monkey;monkey.patch_all()
     import geventwebsocket
-    import greenstack
 except ImportError:
     pass
 else:
