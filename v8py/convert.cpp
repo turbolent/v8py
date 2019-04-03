@@ -141,6 +141,15 @@ Local<Value> js_from_py(PyObject *value, Local<Context> context) {
     }
 
 #if PY_MAJOR_VERSION >= 3
+    if (PyBytes_Check(value) && PyObject_CheckBuffer(value)) {
+        Py_buffer view;
+        int error = PyObject_GetBuffer(value, &view, PyBUF_SIMPLE);
+        Local<ArrayBuffer> js_value = ArrayBuffer::New(isolate, view.len);
+        memcpy(js_value->GetContents().Data(), view.buf, view.len);
+        PyBuffer_Release(&view);
+        return hs.Escape(js_value);
+    }
+
     if (PyUnicode_Check(value)) {
         Py_ssize_t len;
         const char *str = PyUnicode_AsUTF8AndSize(value, &len);
