@@ -117,10 +117,10 @@ MaybeLocal<UnboundScript> script_compile(Local<Context> context, PyObject *sourc
     if (filename != Py_None) {
         ScriptOrigin origin(js_from_py(filename, context));
         ScriptCompiler::Source js_source(js_from_py(source, context).As<String>(), origin);
-        maybe_script = ScriptCompiler::CompileUnbound(isolate, &js_source);
+        maybe_script = ScriptCompiler::CompileUnboundScript(isolate, &js_source);
     } else {
         ScriptCompiler::Source js_source(js_from_py(source, context).As<String>());
-        maybe_script = ScriptCompiler::CompileUnbound(isolate, &js_source);
+        maybe_script = ScriptCompiler::CompileUnboundScript(isolate, &js_source);
     }
     if (maybe_script.IsEmpty())
         return maybe_script;

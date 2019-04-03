@@ -289,7 +289,7 @@ void py_class_init_js_object(Local<Object> js_object, PyObject *py_object, Local
     assert(!last_proto.IsEmpty());
     if (last_proto_object->Get(context, JSTR("__proto__")).ToLocalChecked()->StrictEquals(I_CAN_HAZ_ERROR_PROTOTYPE)) {
         last_proto_object->Delete(context, JSTR("__proto__")).FromJust();
-        last_proto_object->SetPrototype(context->GetEmbedderData(ERROR_PROTOTYPE_SLOT));
+        last_proto_object->SetPrototype(context, context->GetEmbedderData(ERROR_PROTOTYPE_SLOT));
     }
 
     Persistent<Object> *obj_handle = new Persistent<Object>(isolate, js_object);

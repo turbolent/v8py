@@ -200,7 +200,7 @@ PyObject *js_object_repr(js_object *self) {
     Local<Context> context = object->CreationContext();
     Context::Scope cs(context);
 
-    return py_from_js(object->ToString(), context);
+    return py_from_js(object->ToString(context).ToLocalChecked(), context);
 }
 
 void js_object_dealloc(js_object *self) {

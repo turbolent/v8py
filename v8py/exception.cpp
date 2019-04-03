@@ -33,7 +33,7 @@ PyObject *js_exception_new(Local<Value> exception, Local<Message> message) {
     self->exception.Reset(isolate, exception);
     self->message.Reset(isolate, message);
 
-    PyObject *py_message = py_from_js(exception->ToString(), no_ctx);
+    PyObject *py_message = py_from_js(exception->ToString(no_ctx).ToLocalChecked(), no_ctx);
     PyErr_PROPAGATE(py_message);
 #if PY_MAJOR_VERSION < 3
     self->base.message = py_message;
@@ -97,19 +97,19 @@ void py_throw_js(Local<Value> js_exc, Local<Message> js_message) {
 
     Local<StackTrace> stack_trace = js_message->GetStackTrace();
     for (int i = 0; i < stack_trace->GetFrameCount(); i++) {
-        Local<StackFrame> stack_frame = stack_trace->GetFrame(i);
+        Local<StackFrame> stack_frame = stack_trace->GetFrame(isolate, i);
 
         // Not documented, but arguments to PyCode_NewEmpty go through
         // PyUnicode_FromString, so they're UTF-8 encoded
         Local<String> js_func_name = stack_frame->GetFunctionName();
         // whenever I remember the terrible bug introduced by not having
         // space for the null terminator, I get chills
-        char *func_name = (char *) malloc(js_func_name->Utf8Length() + 1);
+        char *func_name = (char *) malloc(js_func_name->Utf8Length(isolate) + 1);
         if (func_name == NULL) {
             // fuck it, plenty of shit is probably already breaking anyway
             func_name = (char *) "help i'm trapped in a computer that's out of memory";
         } else {
-            js_func_name->WriteUtf8(func_name);
+            js_func_name->WriteUtf8(isolate, func_name);
         }
 
         PyObject *script_name_unicode = construct_script_name(stack_frame->GetScriptName(), stack_frame->GetScriptId());

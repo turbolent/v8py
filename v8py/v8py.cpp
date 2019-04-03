@@ -86,14 +86,14 @@ PyObject *construct_new_object(PyObject *self, PyObject *args) {
         for (long i = 0; i < argc; i++) {
             argv[i] = js_from_py(PyTuple_GET_ITEM(args, i + 1), context);
         }
-        result = object->CallAsConstructor(argc, argv);
+        result = object->CallAsConstructor(context, argc, argv);
     } else {
 #endif
         Local<Value> *argv = new Local<Value>[argc];
         for (long i = 0; i < argc; i++) {
             argv[i] = js_from_py(PyTuple_GET_ITEM(args, i + 1), context);
         }
-        result = object->CallAsConstructor(argc, argv);
+        result = object->CallAsConstructor(context, argc, argv);
         delete[] argv;
 #ifndef _WIN32
     }

@@ -66,7 +66,7 @@ int debugger_init(debugger_c *self, PyObject *args, PyObject *kwargs) {
 
     if (context->has_debugger) {
         PyErr_SetString(PyExc_ValueError, "specified context already has a debugger attached");
-        return NULL;
+        return 0;
     }
     context->has_debugger = true;
 
@@ -172,11 +172,7 @@ std::unique_ptr<StringBuffer> stringview_from_json(PyObject *json) {
     Py_DECREF(string);
     string = message_unicode;
 #endif
-    int endian = htons(1) == 1? 1 : -1;
-    PyObject *utf16_bytes = PyUnicode_EncodeUTF16(
-            PyUnicode_AS_UNICODE(string), 
-            PyUnicode_GET_SIZE(string), 
-            NULL, endian);
+    PyObject *utf16_bytes = PyUnicode_AsUTF16String(string);
     PyErr_PROPAGATE(utf16_bytes);
     Py_DECREF(string);
     const uint16_t *command_bytes = (const uint16_t *) PyString_AS_STRING(utf16_bytes);
