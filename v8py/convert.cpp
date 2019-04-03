@@ -141,7 +141,7 @@ Local<Value> js_from_py(PyObject *value, Local<Context> context) {
     }
 
 #if PY_MAJOR_VERSION >= 3
-    if (PyBytes_Check(value) && PyObject_CheckBuffer(value)) {
+    if (PyBytes_Check(value)) {
         Py_buffer view;
         int error = PyObject_GetBuffer(value, &view, PyBUF_SIMPLE);
         Local<ArrayBuffer> js_value = ArrayBuffer::New(isolate, view.len);
@@ -154,14 +154,6 @@ Local<Value> js_from_py(PyObject *value, Local<Context> context) {
         Py_ssize_t len;
         const char *str = PyUnicode_AsUTF8AndSize(value, &len);
         Local<String> js_value = String::NewFromUtf8(isolate, str, NewStringType::kNormal, len).ToLocalChecked();
-        return hs.Escape(js_value);
-    }
-    if (PyString_Check(value)) {
-        char *str;
-        Py_ssize_t len;
-        PyBytes_AsStringAndSize(value, &str, &len);
-        Local<ArrayBuffer> js_value = ArrayBuffer::New(isolate, len);
-        memcpy(str, js_value->GetContents().Data(), len);
         return hs.Escape(js_value);
     }
 #else
