@@ -33,19 +33,4 @@ inline extern int PyString_StartsWithString(PyObject *str, const char *prefix) {
 
 #endif
 
-#if PY_MAJOR_VERSION >= 3
-
-#define PyInstance_Check(x) false
-#define PyClass_Check(x) false
-
-#define PyString_Check PyUnicode_Check
-#define PyString_InternFromString PyUnicode_InternFromString
-#define PyString_AS_STRING PyBytes_AS_STRING
-#define PyString_GET_SIZE PyBytes_GET_SIZE
-#define PyInt_AsSsize_t PyLong_AsSsize_t
-
-#define nb_nonzero nb_bool
-
 #define Py_TPFLAGS_HAVE_WEAKREFS 0
-
-#endif

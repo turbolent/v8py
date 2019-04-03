@@ -42,7 +42,7 @@ void create_memes_plz_thx();
 // They do nothing for us Kappa
 // So we call them interns Kappa
 #define KAPPA(name, value) \
-    static PyObject *name = PyString_InternFromString(value)
+    static PyObject *name = PyUnicode_InternFromString(value)
 #define KAPPA_PRIDE(name) KAPPA(name, #name)
 KAPPA_PRIDE(__dict__);
 // Kappa

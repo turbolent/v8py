@@ -35,10 +35,6 @@ PyObject *js_exception_new(Local<Value> exception, Local<Message> message) {
 
     PyObject *py_message = py_from_js(exception->ToString(no_ctx).ToLocalChecked(), no_ctx);
     PyErr_PROPAGATE(py_message);
-#if PY_MAJOR_VERSION < 3
-    self->base.message = py_message;
-    Py_INCREF(self->base.message);
-#endif
     self->base.args = PyTuple_New(1);
     PyErr_PROPAGATE(self->base.args);
     PyTuple_SetItem(self->base.args, 0, py_message);
@@ -116,13 +112,9 @@ void py_throw_js(Local<Value> js_exc, Local<Message> js_message) {
         if (script_name_unicode == NULL) return;
         PyObject *script_name_string = PyUnicode_AsUTF8String(script_name_unicode);
         if (script_name_string == NULL) return;
-#if PY_MAJOR_VERSION >= 3
         // I can't use the macro form because it uses assert and I
         // redefined assert to not be an expression
         char *script_name = PyBytes_AsString(script_name_string);
-#else
-        char *script_name = PyString_AS_STRING(script_name_string);
-#endif
 
         PyCodeObject *code = PyCode_NewEmpty(script_name, func_name, stack_frame->GetLineNumber());
         Py_DECREF(script_name_string);

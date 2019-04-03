@@ -55,12 +55,7 @@ PyObject *py_class_new(PyObject *cls) {
 
     assert(cls != (PyObject *) &PyBaseObject_Type);
     PyObject *bases; // borrowed reference
-#if PY_MAJOR_VERSION < 3
-    if (PyClass_Check(cls)) {
-        bases = PyClass_GET_BASES(cls);
-    } else
-#endif
-        bases = ((PyTypeObject *) cls)->tp_bases;
+    bases = ((PyTypeObject *) cls)->tp_bases;
 
     py_class *self = (py_class *) py_class_type.tp_alloc(&py_class_type, 0);
     PyErr_PROPAGATE(self);
@@ -154,22 +149,16 @@ int add_to_template(PyObject *cls, PyObject *member_name, PyObject *member_value
 
 int add_class_to_template(PyObject *cls, Local<FunctionTemplate> templ) {
     PyObject *dict;
-    if (PyClass_Check(cls)) {
-        // old style
-        dict = PyObject_GetAttr(cls, __dict__);
-    } else {
-        // new style
-        // Sorry, but I have to do this to use PyDict_Next. At least the layout
-        // is the same on 2 and 3.
-        struct dictproxy {
-            PyObject_HEAD
-            PyObject *dict;
-        };
-        struct dictproxy *proxy = (struct dictproxy *) PyObject_GenericGetAttr(cls, __dict__);
-        dict = proxy->dict;
-        Py_INCREF(dict);
-        Py_DECREF(proxy);
-    }
+    // Sorry, but I have to do this to use PyDict_Next. At least the layout
+    // is the same on 2 and 3.
+    struct dictproxy {
+        PyObject_HEAD
+        PyObject *dict;
+    };
+    struct dictproxy *proxy = (struct dictproxy *) PyObject_GenericGetAttr(cls, __dict__);
+    dict = proxy->dict;
+    Py_INCREF(dict);
+    Py_DECREF(proxy);
     PyErr_PROPAGATE(dict);
     PyObject *member_name, *member_value;
     Py_ssize_t pos = 0;

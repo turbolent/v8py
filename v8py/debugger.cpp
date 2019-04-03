@@ -165,17 +165,10 @@ std::unique_ptr<StringBuffer> stringview_from_json(PyObject *json) {
 
     PyObject *string = PyObject_CallFunctionObjArgs(dumps, json, NULL);
     PyErr_PROPAGATE(string);
-#if PY_MAJOR_VERSION < 3
-    PyObject *message_unicode = PyUnicode_DecodeASCII(
-            PyString_AS_STRING(string), PyString_GET_SIZE(string), NULL);
-    PyErr_PROPAGATE(message_unicode);
-    Py_DECREF(string);
-    string = message_unicode;
-#endif
     PyObject *utf16_bytes = PyUnicode_AsUTF16String(string);
     PyErr_PROPAGATE(utf16_bytes);
     Py_DECREF(string);
-    const uint16_t *command_bytes = (const uint16_t *) PyString_AS_STRING(utf16_bytes);
-    int length = PyString_GET_SIZE(utf16_bytes)/2; // it wants the number of characters, not the number of bytes
+    const uint16_t *command_bytes = (const uint16_t *) PyBytes_AS_STRING(utf16_bytes);
+    int length = PyBytes_GET_SIZE(utf16_bytes)/2; // it wants the number of characters, not the number of bytes
     return StringBuffer::create(StringView(command_bytes, length));
 }

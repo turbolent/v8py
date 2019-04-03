@@ -61,7 +61,7 @@ PyObject *context_new(PyTypeObject *type, PyObject *args, PyObject *kwargs) {
         return NULL;
     }
     if (global != NULL) {
-        if (PyType_Check(global) || PyClass_Check(global)) {
+        if (PyType_Check(global)) {
             PyObject *no_args = PyTuple_New(0);
             PyErr_PROPAGATE(no_args);
             global = PyObject_Call(global, no_args, NULL);
@@ -80,12 +80,8 @@ PyObject *context_new(PyTypeObject *type, PyObject *args, PyObject *kwargs) {
     MaybeLocal<ObjectTemplate> global_template;
     if (global != NULL) {
         PyObject *global_type;
-        if (PyInstance_Check(global)) {
-            global_type = PyObject_GetAttrString(global, "__class__");
-        } else {
-            global_type = (PyObject *) Py_TYPE(global);
-            Py_INCREF(global_type);
-        }
+        global_type = (PyObject *) Py_TYPE(global);
+        Py_INCREF(global_type);
         py_class *templ;
         templ = (py_class *) py_class_to_template(global_type);
         Py_DECREF(global_type);
@@ -279,12 +275,12 @@ PyObject *context_eval(context_c *self, PyObject *args, PyObject *kwargs) {
     if (PyArg_ParseTupleAndKeywords(args, kwargs, "O|dO", (char **) keywords, &program, &timeout, &filename) < 0) {
         return NULL;
     }
-    if (!PyString_Check(program) && !PyObject_TypeCheck(program, &script_type)) {
+    if (!PyUnicode_Check(program) && !PyObject_TypeCheck(program, &script_type)) {
         PyErr_SetString(PyExc_TypeError, "program must be a string or Script");
         return NULL;
     }
 
-    if (PyString_Check(program)) {
+    if (PyUnicode_Check(program)) {
         program = PyObject_CallFunctionObjArgs((PyObject *) &script_type, program, filename, NULL);
         PyErr_PROPAGATE(program);
     } else {
@@ -324,7 +320,7 @@ Local<Object> context_get_cached_jsobject(Local<Context> js_context, PyObject *p
         js_object *jsobj = (js_object *) PyObject_GetItem(self->js_object_cache, py_object);
         if (jsobj == NULL) {
             // fuck
-            PyErr_WriteUnraisable(PyString_InternFromString("v8py py_class_create_js_object getitem"));
+            PyErr_WriteUnraisable(PyUnicode_InternFromString("v8py py_class_create_js_object getitem"));
         }
         return hs.Escape(jsobj->object.Get(isolate));
     }
@@ -340,7 +336,7 @@ void context_set_cached_jsobject(Local<Context> js_context, PyObject *py_object,
             // if it's a type error, it's probably "cannot create weak reference" and should be ignored.
             PyErr_Clear();
         } else {
-            PyErr_WriteUnraisable(PyString_InternFromString("v8py py_class_create_js_object setitem"));
+            PyErr_WriteUnraisable(PyUnicode_InternFromString("v8py py_class_create_js_object setitem"));
         }
     }
 }

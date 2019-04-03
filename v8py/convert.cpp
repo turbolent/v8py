@@ -140,7 +140,6 @@ Local<Value> js_from_py(PyObject *value, Local<Context> context) {
         return hs.Escape(Null(isolate));
     }
 
-#if PY_MAJOR_VERSION >= 3
     if (PyBytes_Check(value)) {
         Py_buffer view;
         int error = PyObject_GetBuffer(value, &view, PyBUF_SIMPLE);
@@ -156,29 +155,13 @@ Local<Value> js_from_py(PyObject *value, Local<Context> context) {
         Local<String> js_value = String::NewFromUtf8(isolate, str, NewStringType::kNormal, len).ToLocalChecked();
         return hs.Escape(js_value);
     }
-#else
-    if (PyUnicode_Check(value)) {
-        PyObject *value_encoded = PyUnicode_EncodeUTF8(PyUnicode_AS_UNICODE(value), PyUnicode_GET_SIZE(value), NULL);
-        Local<String> js_value = String::NewFromUtf8(isolate, PyString_AS_STRING(value_encoded), NewStringType::kNormal, PyString_GET_SIZE(value_encoded)).ToLocalChecked();
-        Py_DECREF(value_encoded);
-        return hs.Escape(js_value);
-    } 
-    if (PyString_Check(value)) {
-        Local<String> js_value = String::NewFromUtf8(isolate, PyString_AS_STRING(value), NewStringType::kNormal, PyString_GET_SIZE(value)).ToLocalChecked();
-        return hs.Escape(js_value);
-    }
-#endif
 
-    if (PyNumber_Check(value) && !PyInstance_Check(value)) {
+    if (PyNumber_Check(value)) {
         Local<Number> js_value;
         if (PyFloat_Check(value)) {
             js_value = Number::New(isolate, PyFloat_AS_DOUBLE(value));
         } else if (PyLong_Check(value)) {
             js_value = Integer::New(isolate, PyLong_AsLong(value));
-#if PY_MAJOR_VERSION < 3
-        } else if (PyInt_Check(value)) {
-            js_value = Integer::New(isolate, PyInt_AS_LONG(value));
-#endif
         } else {
             // TODO make this work right
             printf("what the hell kind of number is this?!");
@@ -218,7 +201,7 @@ Local<Value> js_from_py(PyObject *value, Local<Context> context) {
         return hs.Escape(py_template_to_function(templ, context));
     }
 
-    if (PyType_Check(value) || PyClass_Check(value)) {
+    if (PyType_Check(value)) {
         py_class *templ = (py_class *) py_class_to_template(value);
         return hs.Escape(py_class_get_constructor(templ, context));
     }
@@ -230,12 +213,8 @@ Local<Value> js_from_py(PyObject *value, Local<Context> context) {
 
     // it's an arbitrary object
     PyObject *type;
-    if (PyInstance_Check(value)) {
-        type = PyObject_GetAttrString(value, "__class__");
-    } else {
-        type = (PyObject *) Py_TYPE(value);
-        Py_INCREF(type);
-    }
+    type = (PyObject *) Py_TYPE(value);
+    Py_INCREF(type);
     py_class *templ = (py_class *) py_class_to_template(type);
     Py_DECREF(type);
     return hs.Escape(py_class_create_js_object(templ, value, context));

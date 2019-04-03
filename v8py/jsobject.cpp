@@ -109,13 +109,8 @@ PyObject *js_object_getattro(js_object *self, PyObject *name) {
         PyObject *class_name_string = PyObject_Str(class_name);
         Py_DECREF(class_name);
         PyErr_PROPAGATE(class_name_string);
-#if PY_MAJOR_VERSION < 3
-        PyErr_Format(PyExc_AttributeError, "'%.50s' JavaScript object has no attribute '%.400s'", 
-                PyString_AS_STRING(class_name_string), PyString_AS_STRING(name));
-#else
-        PyErr_Format(PyExc_AttributeError, "'%.50S' JavaScript object has no attribute '%.400S'", 
+        PyErr_Format(PyExc_AttributeError, "'%.50S' JavaScript object has no attribute '%.400S'",
                 class_name_string, name);
-#endif
         Py_DECREF(class_name_string);
         return NULL;
     }

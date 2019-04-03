@@ -119,7 +119,7 @@ typedef struct {PyObject_HEAD} null_t;
 PyObject *null_repr(PyObject *self) {
     static PyObject *repr = NULL;
     if (repr == NULL) {
-        repr = PyString_InternFromString("Null");
+        repr = PyUnicode_InternFromString("Null");
     }
     Py_INCREF(repr);
     return repr;
@@ -133,7 +133,7 @@ int null_type_init() {
     null_type.tp_name = "v8py.NullType";
     null_type.tp_basicsize = sizeof(null_t);
     null_type.tp_flags = Py_TPFLAGS_DEFAULT;
-    null_as_number.nb_nonzero = null_bool;
+    null_as_number.nb_bool = null_bool;
     null_type.tp_as_number = &null_as_number;
     null_type.tp_repr = null_repr;
     null_type.tp_doc = "";
@@ -143,29 +143,17 @@ int null_type_init() {
     return 0;
 }
 
-#if PY_MAJOR_VERSION < 3
-#define FAIL
-#else
 #define FAIL NULL
-#endif
 
-#if PY_MAJOR_VERSION < 3
-PyMODINIT_FUNC init_v8py() {
-#else
 PyMODINIT_FUNC PyInit__v8py() {
-#endif
     initialize_v8();
     create_memes_plz_thx();
 
-#if PY_MAJOR_VERSION < 3
-    PyObject *module = Py_InitModule("_v8py", v8_methods);
-#else
     static struct PyModuleDef v8_module_def = {PyModuleDef_HEAD_INIT};
     v8_module_def.m_name = "_v8py";
     v8_module_def.m_size = -1;
     v8_module_def.m_methods = v8_methods;
     PyObject *module = PyModule_Create(&v8_module_def);
-#endif
     if (module == NULL) return FAIL;
 
     if (context_type_init() < 0) return FAIL;
@@ -207,9 +195,7 @@ PyMODINIT_FUNC PyInit__v8py() {
     Py_INCREF(null_object);
     PyModule_AddObject(module, "Null", null_object);
 
-#if PY_MAJOR_VERSION >= 3
     return module;
-#endif
 }
 
 NO_RETURN void assert_failed(const char *condition, const char *file, int line) {

@@ -39,7 +39,7 @@ int script_type_init() {
     scripts_by_name = PyObject_CallObject(weak_value_dict, NULL);
     PyErr_PROPAGATE_(scripts_by_name);
 
-    javascript = PyString_InternFromString("javascript");
+    javascript = PyUnicode_InternFromString("javascript");
 
     script_type.tp_name = "v8py.Script";
     script_type.tp_basicsize = sizeof(script_c);
@@ -81,11 +81,11 @@ PyObject *script_new(PyTypeObject *type, PyObject *args, PyObject *kwargs) {
     if (PyArg_ParseTupleAndKeywords(args, kwargs, "O|O", (char **) keywords, &source, &filename) < 0) {
         return NULL;
     }
-    if (!PyString_Check(source)) {
+    if (!PyUnicode_Check(source)) {
         PyErr_SetString(PyExc_TypeError, "source must be a string");
         return NULL;
     }
-    if (filename != Py_None && !PyString_Check(filename)) {
+    if (filename != Py_None && !PyUnicode_Check(filename)) {
         PyErr_SetString(PyExc_TypeError, "filename must be a string or None");
         return NULL;
     }
