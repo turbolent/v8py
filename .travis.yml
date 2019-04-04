@@ -10,6 +10,3 @@ install:
 
 script:
     - export LD_LIBRARY_PATH=`pwd`/v8; ./setup.py test
-
-after_success:
-    - bash <(curl -s https://codecov.io/bash)
