@@ -2,13 +2,15 @@
 
 version = 7.3.492.25
 
-export PATH := $(PATH):$(shell pwd)/depot_tools
+export PATH := $(shell pwd)/depot_tools:$(PATH)
 
 UNAME_S := $(shell uname -s)
 
 
 depot_tools:
 	git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+	echo '#!/bin/sh\npython2 "$@"' > depot_tools/python
+	chmod +x depot_tools/python
 
 v8: depot_tools
 	fetch v8
