@@ -5,6 +5,7 @@ dist: xenial
 
 install:
     - pip install twine pytest
+    - make deps
     - make d8
 
 script:
