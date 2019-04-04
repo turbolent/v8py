@@ -24,7 +24,7 @@ v8_libraries = ["v8", "v8_libbase", "v8_libplatform", "icui18n", "icuuc"]
 
 libraries = list(v8_libraries)
 
-library_dirs = ["/usr/local/opt/v8/libexec", "v8/out.gn"]
+library_dirs = ["/usr/local/opt/v8/libexec", "v8"]
 include_dirs = ["/usr/local/opt/v8/libexec/include", "v8/include"]
 extra_compile_args = ['-std=c++11']
 extra_link_args = []
