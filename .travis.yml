@@ -5,28 +5,11 @@ dist: xenial
 
 install:
     - pip install twine pytest
-    - make deps
-    - make d8
+    - wget https://gist.github.com/turbolent/8e3c60257d3d8aabfd55d2090f38b960/raw/1173f3150ba55fc863c03b7b9c3a45fdcf0c5093/v8-xenial-7.3.492.25.tar.gz
+    - tar xzvf v8-xenial-7.3.492.25.tar.gz
 
 script:
     - ./setup.py test
 
-# it takes ages to compile v8 so don't do it too often
-cache:
-    directories:
-        - v8
-
 after_success:
     - bash <(curl -s https://codecov.io/bash)
-
-# deploy:
-#    provider: pypi
-#    user: tbodt
-#    password:
-#        secure: TeSSoX1sjprFbi3BbK7vDNVXzM/nSxxbcVyxF0Itvu0jqSWQhcRvtEr74wdW4nTyNTBxlfY1+HbDqwvNeADb+kyaQdlzlR/zQ2V3GCQ5muN0R8Lslfi+EI5rMf/h1pNuPxSm6yYA4qogN3QMEY9CiUgOmSG7RGsAXtgMLR48h9qQ0UNCTW/DqozKFD5HIi8os0HoURFtJRPafXLsRbJS8StRZmEjQDvsrfcMYxwlLsNikbfSR8TvBbztEum4mi5OqLl9Jbz0QH4sqfxhouvikXDxZlWYMdPZOuEzXBfDrMWCJXGIekSbQQ14N/j2PDDjNTVF4/88Z25dleqHj2F8+e0Fm7YVlyCNYNylwCjcB9zBkVc1QcAtn2dEpyPXjjsDTIoSNgmRNqaabCSLLUePzHxWnIm/P9leMpu8fCEofHptPV+GEOK1csVspKzi7xZT1fbXQlF0TsExPpv3RN390J7SrVJ2lZOVYn8jiJ1AMc9pWIRuC4blHTkYiZFyVsdqCcwMyMLpoTsSrH4WI/tts3o6Rp+FZmENf2cxtW267XThMjHZxvH9BOd+6EKcBruKV1ux7+ObQZmpCrV4KBPShUukMyruA/R6fvXsAlD70AUPj/cyCHB6HszyYrFarCckgUPaUtWa3IUWgMzyEI5inyllj+cxcm9c65WsObY+Ico=
-#    on:
-#        tags: true
-#        repo: tbodt/v8py
-#    distributions: sdist bdist_wheel
-#    skip_upload_docs: true
-
