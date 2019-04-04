@@ -19,16 +19,19 @@ os.chdir(os.path.abspath(os.path.dirname(__file__)))
 sources = list(map(lambda path: os.path.join('v8py', path),
                    filter(lambda path: path.endswith('.cpp'),
                           os.listdir('v8py'))))
-v8_libraries = ["v8", "v8_libbase", "v8_libplatform"]
+
+v8_libraries = ["v8", "v8_libbase", "v8_libplatform", "icui18n", "icuuc"]
+
 libraries = list(v8_libraries)
 
-library_dirs = ["/usr/local/opt/v8/libexec"]
-include_dirs = ["/usr/local/opt/v8/libexec/include"]
+library_dirs = ["/usr/local/opt/v8/libexec", "v8/out.gn"]
+include_dirs = ["/usr/local/opt/v8/libexec/include", "v8/include"]
 extra_compile_args = ['-std=c++11']
 extra_link_args = []
 
 if sys.platform.startswith('linux'):
     libraries.append('rt')
+    libraries.append('stdc++')
 
 if sys.platform.startswith('darwin'):
     extra_compile_args.append('-stdlib=libc++')
@@ -41,16 +44,6 @@ extension = Extension('_v8py',
                       extra_compile_args=extra_compile_args,
                       extra_link_args=extra_link_args,
                       language='c++')
-
-
-@contextmanager
-def cd(path):
-    old_cwd = os.getcwd()
-    try:
-        yield os.chdir(path)
-    finally:
-        os.chdir(old_cwd)
-
 
 DEPOT_TOOLS_PATH = os.path.join(os.getcwd(), 'depot_tools')
 COMMAND_ENV = os.environ.copy()
