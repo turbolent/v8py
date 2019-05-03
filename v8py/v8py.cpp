@@ -12,13 +12,13 @@
 
 using namespace v8;
 
-static Platform *current_platform = NULL;
+static std::unique_ptr<v8::Platform> current_platform;
 Isolate *isolate = NULL;
 void initialize_v8() {
     if (current_platform == NULL) {
         V8::InitializeICU();
-        current_platform = platform::CreateDefaultPlatform();
-        V8::InitializePlatform(current_platform);
+        current_platform = platform::NewDefaultPlatform();
+        V8::InitializePlatform(current_platform.get());
         V8::Initialize();
         // strlen is slow but that doesn't matter much here because this only happens once
         V8::SetFlagsFromString("--expose_gc", strlen("--expose_gc"));
